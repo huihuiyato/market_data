@@ -208,6 +208,7 @@ class ArcticDataSource(DataSource):
         '''
         if len(ohlc) > 0:
             symbol = self.reverse_symbol(symbol)
+            ohlc.in_bar = [x.strftime("%Y-%m-%d %H:%M:%S") for x in ohlc.in_bar]
             lib = self.__arctic['TRADE_AFTER']
             ohlc["index"] = ohlc.index
             ohlc = ohlc.sort_values('index')
