@@ -10,8 +10,8 @@ if __name__ == '__main__':
     # minute_k = market.get_minutes_bar('600734.SH', '2016-07-09 09:30:00', '2016-12-01 15:30:00')
     # print minute_k
 
-    # tick = market.get_tick('600006.SH', '2017-01-01 01:00:00', '2017-01-17 20:30:00')
-    # print tick
+    tick = market.get_tick('600006.SH', '2017-01-01 00:00:00', '2017-10-1 20:30:00')
+    print tick
 
     # trade = market.get_trade('600006.SH', '2017-03-01 01:00:00', '2017-04-01 09:30:00')
     # print trade

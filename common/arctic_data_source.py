@@ -146,6 +146,18 @@ class ArcticDataSource(DataSource):
             records = ohlc.to_dict('records')
             lib.write(symbol, records)
 
+    def write_after_tick_to_arctic(self, symbol, ohlc):
+        '''
+        'Load after the calculation tick data to mongodb
+        :param symbol: stock symbol eg: SZ.399003
+        :param ohlc: pandas dataFrame
+        :return: None
+        '''
+        if len(ohlc) > 0:
+            lib = self.__arctic['TICK_AFTER']
+            records = ohlc.to_dict('records')
+            lib.write(symbol, records)
+
     def get_tick(self, symbol, start = None, end = None):
         '''
         'get tick data from mongodb
@@ -180,6 +192,18 @@ class ArcticDataSource(DataSource):
             lib = self.__arctic['TRADE']
             ohlc["index"] = ohlc.index
             ohlc = ohlc.sort_values('index')
+            records = ohlc.to_dict('records')
+            lib.write(symbol, records)
+
+    def write_after_trade_to_arctic(self, symbol, ohlc):
+        '''
+        'Load after the calculation trade data to mongodb
+        :param symbol: stock symbol eg: SZ.399003
+        :param ohlc: pandas dataFrame
+        :return: None
+        '''
+        if len(ohlc) > 0:
+            lib = self.__arctic['TRADE_AFTER']
             records = ohlc.to_dict('records')
             lib.write(symbol, records)
 

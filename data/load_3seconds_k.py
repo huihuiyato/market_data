@@ -2,8 +2,6 @@ import sys
 sys.path.append('/home/market/code/market_data/')
 import pandas as pd
 import numpy as np
-import pickle
-
 from common.data_source_factory import DataSourceFactory
 
 def combine_trade_tick(trade, tick):
@@ -76,7 +74,7 @@ def combine_trade_tick(trade, tick):
             j += 1
 
         index_end = j - 1
-        print '%s, %s, %s' % (tick.iloc[i].name, index_start, index_end)
+        # print '%s, %s, %s' % (tick.iloc[i].name, index_start, index_end)
 
         # now this tick contains trade[index_start, index_end], both included
         tick['open'].iloc[i] = trade['price'].iloc[index_start]
@@ -92,19 +90,21 @@ def combine_trade_tick(trade, tick):
 
 if __name__ == '__main__':
     market = DataSourceFactory.get_data_source()
-
     instrument = ['600348.SH', '000552.SZ']
-    df_dict_list = []
     for instrument_ in instrument:
-        tick_ = market.get_tick(instrument_, '2017-03-07 09:30:00', '2017-03-07 15:00:00')
-        trade_ = market.get_trade(instrument_, '2017-03-07 09:29:00', '2017-03-07 15:01:00')
-        trade_, tick_ = combine_trade_tick(trade_, tick_)
-        df_dict_list.append(tick_)
+        tick_set = set()
+        tick = market.get_tick(instrument_, '2017-01-01 00:00:00', '2017-10-15 20:30:00')
+        for index in tick.index:
+            tick_set.add(index.strftime('%Y-%m-%d'))
+        for d in tick_set:
+            tick_ = market.get_tick(instrument_, d + ' 09:00:00', d + ' 16:00:00')
+            market.write_after_tick_to_arctic(instrument_, tick_)
 
-    print df_dict_list
-    # file_name = 'new_feed _bar_07.data'
-    # fout = open(file_name, 'w')
-    # pickle.dump(df_dict_list, fout)
-    # fout.close()
-
+        trade_set = set()
+        trade = market.get_trade(instrument_, '2017-01-01 00:00:00', '2017-10-15 20:30:00')
+        for index in trade.index:
+            trade_set.add(index.strftime('%Y-%m-%d'))
+        for d in trade_set:
+            trade_ = market.get_trade(instrument_, d+' 09:00:00', d+' 16:00:00')
+            market.write_after_trade_to_arctic(instrument_, trade_)
 
