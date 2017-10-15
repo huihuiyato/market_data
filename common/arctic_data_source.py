@@ -155,6 +155,8 @@ class ArcticDataSource(DataSource):
         '''
         if len(ohlc) > 0:
             lib = self.__arctic['TICK_AFTER']
+            ohlc["index"] = ohlc.index
+            ohlc = ohlc.sort_values('index')
             records = ohlc.to_dict('records')
             lib.write(symbol, records)
 
@@ -204,6 +206,8 @@ class ArcticDataSource(DataSource):
         '''
         if len(ohlc) > 0:
             lib = self.__arctic['TRADE_AFTER']
+            ohlc["index"] = ohlc.index
+            ohlc = ohlc.sort_values('index')
             records = ohlc.to_dict('records')
             lib.write(symbol, records)
 

@@ -90,6 +90,9 @@ def combine_trade_tick(trade, tick):
 
 if __name__ == '__main__':
     market = DataSourceFactory.get_data_source()
+    market.create_collection('TICK_AFTER')
+    market.create_collection('TRADE_AFTER')
+
     instrument = ['600348.SH', '000552.SZ']
     for instrument_ in instrument:
         tick_set = set()
