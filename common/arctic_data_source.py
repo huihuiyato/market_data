@@ -154,13 +154,14 @@ class ArcticDataSource(DataSource):
         :return: None
         '''
         if len(ohlc) > 0:
+            symbol = self.reverse_symbol(symbol)
             lib = self.__arctic['TICK_AFTER']
             ohlc["index"] = ohlc.index
             ohlc = ohlc.sort_values('index')
             records = ohlc.to_dict('records')
             lib.write(symbol, records)
 
-    def get_tick(self, symbol, start = None, end = None):
+    def get_tick(self, symbol, start = None, end = None, type = None):
         '''
         'get tick data from mongodb
         :param symbol: stock symbol eg: 399003.SZ
@@ -169,7 +170,8 @@ class ArcticDataSource(DataSource):
         :return: pandas dataFrame
         '''
         symbol = self.reverse_symbol(symbol)
-        lib = self.__arctic['TICK']
+        table = 'TICK' if type is None else 'TICK_AFTER'
+        lib = self.__arctic[table]
         date_range = DateRange(start = decode_datetime(start), end = decode_datetime(end))
         return lib.read(symbol, date_range = date_range)
 
@@ -205,13 +207,14 @@ class ArcticDataSource(DataSource):
         :return: None
         '''
         if len(ohlc) > 0:
+            symbol = self.reverse_symbol(symbol)
             lib = self.__arctic['TRADE_AFTER']
             ohlc["index"] = ohlc.index
             ohlc = ohlc.sort_values('index')
             records = ohlc.to_dict('records')
             lib.write(symbol, records)
 
-    def get_trade(self, symbol, start = None, end = None):
+    def get_trade(self, symbol, start = None, end = None, type = None):
         '''
         'get trade data from mongodb
         :param symbol: stock symbol eg: 399003.SZ
@@ -220,7 +223,8 @@ class ArcticDataSource(DataSource):
         :return: pandas dataFrame
         '''
         symbol = self.reverse_symbol(symbol)
-        lib = self.__arctic['TRADE']
+        table = 'TRADE' if type is None else 'TRADE_AFTER'
+        lib = self.__arctic[table]
         date_range = DateRange(start = decode_datetime(start), end = decode_datetime(end))
         return lib.read(symbol, date_range = date_range)
 

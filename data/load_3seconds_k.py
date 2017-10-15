@@ -101,13 +101,7 @@ if __name__ == '__main__':
             tick_set.add(index.strftime('%Y-%m-%d'))
         for d in tick_set:
             tick_ = market.get_tick(instrument_, d + ' 09:00:00', d + ' 16:00:00')
+            trade_ = market.get_trade(instrument_, d + ' 09:00:00', d + ' 16:00:00')
+            trade_, tick_ = combine_trade_tick(trade_, tick_)
             market.write_after_tick_to_arctic(instrument_, tick_)
-
-        trade_set = set()
-        trade = market.get_trade(instrument_, '2017-01-01 00:00:00', '2017-10-15 20:30:00')
-        for index in trade.index:
-            trade_set.add(index.strftime('%Y-%m-%d'))
-        for d in trade_set:
-            trade_ = market.get_trade(instrument_, d+' 09:00:00', d+' 16:00:00')
             market.write_after_trade_to_arctic(instrument_, trade_)
-
