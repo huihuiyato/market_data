@@ -7,6 +7,6 @@ class DataSourceFactory:
         type = MarketConfig.get('DATA_SOURCE', 'TYPE')
         if (type == "arctic"):
             from common.arctic_data_source import ArcticDataSource
-            return ArcticDataSource(mongodb_connect = MarketConfig.get('DATA_SOURCE', 'ARCTIC_CONNECT'))
+            return ArcticDataSource(mongo_connect = MarketConfig.get('DATA_SOURCE', 'ARCTIC_CONNECT'))
         else:
             raise NotImplementedError

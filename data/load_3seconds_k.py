@@ -103,5 +103,18 @@ if __name__ == '__main__':
             tick_ = market.get_tick(instrument_, d + ' 09:00:00', d + ' 16:00:00')
             trade_ = market.get_trade(instrument_, d + ' 09:00:00', d + ' 16:00:00')
             trade_, tick_ = combine_trade_tick(trade_, tick_)
-            market.write_after_tick_to_arctic(instrument_, tick_)
-            market.write_after_trade_to_arctic(instrument_, trade_)
+
+            arr = instrument_.split(".")
+            symbol = arr[1] + '.' + arr[0]
+
+            tick_["index"] = tick_.index
+            tick_ = tick_.sort_values('index')
+            tick_records = tick_.to_dict('records')
+
+            trade_.in_bar = [x.strftime("%Y-%m-%d %H:%M:%S") for x in trade_.in_bar]
+            trade_["index"] = trade_.index
+            trade_ = trade_.sort_values('index')
+            trade_records = trade_.to_dict('records')
+
+            market.write_data_to_arctic(instrument_, tick_records, 'TICK_AFTER')
+            market.write_data_to_arctic(instrument_, trade_records, 'TRADE_AFTER')

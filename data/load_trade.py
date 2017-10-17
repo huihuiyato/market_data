@@ -7,24 +7,41 @@ from threading import Thread
 from common.data_source_factory import DataSourceFactory
 import pandas as pd
 from common.market_time import time_parse
+import pytz
+from datetime import datetime
+TRADE_TABLE = 'TRADE'
 
+tz = pytz.timezone('Asia/Shanghai')
 queue = Queue()
 root_path = MarketConfig.get('FILE_PATH', 'TRADE')
 files = []
 fields = ['datetime', 'price', 'flag', 'amount']
 market = DataSourceFactory.get_data_source()
-market.create_collection('TRADE')
+market.create_collection(TRADE_TABLE)
 
 def do_job():
     while True:
         f = queue.get()
         try:
-            df = pd.read_csv(f, header=None, names=fields)
+            ohlc = pd.read_csv(f, header=None, names=fields)
             file_arr = str(f).split("/")
             date_str = file_arr[len(file_arr)-2]+' '
             symbol = file_arr[len(file_arr)-1].upper().replace("SH","SH.").replace("SZ","SZ.").replace(".CSV","")
-            df.datetime = [time_parse(date_str+str(x)) for x in df.datetime]
-            market.write_trade_to_arctic(symbol, df)
+            ohlc.datetime = [time_parse(date_str+str(x)) for x in ohlc.datetime]
+            ohlc.datetime = pd.to_datetime(ohlc.datetime.astype(str))
+            ohlc = ohlc.rename_axis({'datetime': 'index'}, axis=1)
+            ohlc.set_index('index', inplace=True)
+            ohlc.index = [tz.localize(datetime(
+                datetime.strptime(str(x), "%Y-%m-%d %H:%M:%S").year,
+                datetime.strptime(str(x), "%Y-%m-%d %H:%M:%S").month,
+                datetime.strptime(str(x), "%Y-%m-%d %H:%M:%S").day,
+                datetime.strptime(str(x), "%Y-%m-%d %H:%M:%S").hour,
+                datetime.strptime(str(x), "%Y-%m-%d %H:%M:%S").minute,
+                datetime.strptime(str(x), "%Y-%m-%d %H:%M:%S").second)) for x in ohlc.index]
+            ohlc["index"] = ohlc.index
+            ohlc = ohlc.sort_values('index')
+            records = ohlc.to_dict('records')
+            market.write_data_to_arctic(symbol, records, TRADE_TABLE)
             queue.task_done()
         except Exception as e:
             print str(f)+' fail run again ' + str(e)

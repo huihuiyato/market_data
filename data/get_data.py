@@ -3,17 +3,27 @@ from common.data_source_factory import DataSourceFactory
 
 if __name__ == '__main__':
     market = DataSourceFactory.get_data_source()
+    # ts = market.list_libraries()
 
-    # day_k = market.get_day_bar('000010.SZ', '2014-08-01', '2017-08-30')
+    # syms = market.list_symbols('SZ_MINUTES')
+    # print syms
+
+    # day_k = market.day_k_bars('880950.SH', '2014-08-01', '2017-08-30')
     # print day_k
 
-    # minute_k = market.get_minutes_bar('600734.SH', '2006-04-09 09:30:00', '2017-12-01 15:30:00')
-    # print minute_k
+    # close = market.close_price('880950.SH', '2017-08-28')
+    # print close
 
-    # tick = market.get_tick('600348.SH', '2017-03-27 01:00:00', '2017-03-27 20:30:00')
+    # date = market.last_trade_date('000552.SZ', 'minute')
+    # print date
+
+    minute_k = market.minute_k_bars('399984.SZ')
+    print minute_k
+
+    # tick = market.get_tick('000552.SZ', '2017-08-29 01:00:00', '2017-08-29 20:30:00')
     # print tick
 
-    # trade = market.get_trade('600348.SH', '2017-03-27 01:00:00', '2017-03-27 20:30:00')
+    # trade = market.get_trade('000552.SZ', '2017-01-01 01:00:00', '2017-03-27 20:30:00')
     # print trade
 
     # dividend = market.get_dividend('000895.SZ')
@@ -25,8 +35,3 @@ if __name__ == '__main__':
     # finance = market.get_finance('600006.SH', date = '2017-03-01 01:00:00')
     # print finance.loc[:, [u'时间', u'投资收益']]
 
-    tick_after = market.get_tick('600348.SH', '2017-03-27 01:00:00', '2017-03-27 20:30:00', type='AFTER')
-    print tick_after
-
-    trade_after = market.get_trade('600348.SH', '2017-03-27 01:00:00', '2017-03-27 20:30:00', type='AFTER')
-    print trade_after
