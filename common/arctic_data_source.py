@@ -4,6 +4,7 @@ import json
 import pytz
 from arctic import Arctic
 from arctic.date import DateRange
+from arctic.exceptions import NoDataFoundException
 from pandas import DataFrame
 from datetime import datetime
 from common.base_data_source import DataSource
@@ -79,8 +80,8 @@ class ArcticDataSource(DataSource):
             df = self.day_k_bars(symbol)
         date = df.iloc[-1:].index.values[0]
         ts = pd.to_datetime(str(date))
-        d = ts.strftime('%Y-%m-%d')
-        return d
+        trade_date = ts.strftime('%Y-%m-%d')
+        return trade_date
 
     def day_k_bars(self, symbol, start = '1900-01-01', end = datetime.now().strftime("%Y-%m-%d")):
         '''
@@ -94,7 +95,10 @@ class ArcticDataSource(DataSource):
         table = symbol.split('.')[0] + DAY_SURFIX
         lib = self.__arctic[table]
         date_range = DateRange(start = decode_date(start), end = decode_date(end))
-        return lib.read(symbol, date_range = date_range)
+        try:
+            return lib.read(symbol, date_range = date_range)
+        except NoDataFoundException:
+            return pd.DataFrame()
 
     def minute_k_bars(self, symbol, start = '1900-01-01 00:00:00', end = datetime.now().strftime("%Y-%m-%d %H:%M:%S")):
         '''
@@ -108,7 +112,10 @@ class ArcticDataSource(DataSource):
         table = symbol.split('.')[0] + MINUTE_SURFIX
         lib = self.__arctic[table]
         date_range = DateRange(start = decode_datetime(start), end = decode_datetime(end))
-        return lib.read(symbol, date_range = date_range)
+        try:
+            return lib.read(symbol, date_range = date_range)
+        except NoDataFoundException:
+            return pd.DataFrame()
 
     def get_tick(self, symbol, start = None, end = None, type = None):
         '''
@@ -123,7 +130,10 @@ class ArcticDataSource(DataSource):
         table = 'TICK' if type is None else 'TICK_AFTER'
         lib = self.__arctic[table]
         date_range = DateRange(start = decode_datetime(start), end = decode_datetime(end))
-        return lib.read(symbol, date_range = date_range)
+        try:
+            return lib.read(symbol, date_range = date_range)
+        except NoDataFoundException:
+            return pd.DataFrame()
 
     def get_trade(self, symbol, start = None, end = None, type = None):
         '''
@@ -138,7 +148,10 @@ class ArcticDataSource(DataSource):
         table = 'TRADE' if type is None else 'TRADE_AFTER'
         lib = self.__arctic[table]
         date_range = DateRange(start = decode_datetime(start), end = decode_datetime(end))
-        return lib.read(symbol, date_range = date_range)
+        try:
+            return lib.read(symbol, date_range = date_range)
+        except NoDataFoundException:
+            return pd.DataFrame()
 
     def get_dividend(self, symbol, start_date = '1900-01-01 00:00:00', end_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S")):
         '''
